@@ -10,6 +10,7 @@ __pycache__/
 .venv/
 venv/
 env/
+config.json
 
 # Model checkpoints and generated artifacts
 *.pt

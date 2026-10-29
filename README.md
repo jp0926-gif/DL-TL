@@ -25,6 +25,12 @@ Deep learning and transfer-learning experiments for forecasting cyanobacterial c
 | `BEFORE_TL.py` | TFT experiment before transfer learning |
 | `PRETRAIN_TFT.py` | TFT pretraining workflow |
 | `FINE_TUNE_S1TO4.py` | Fine-tuning schemes A–D |
+| `dltl/common.py` | Shared preprocessing, sequence creation and TFT training utilities |
+| `dltl/baseline.py` | Shared baseline-model training loop |
+| `dltl/recurrent.py` | Shared LSTM, GRU and BiLSTM model definitions |
+| `dltl/tft.py` | Shared TFT layers, loss and model definition |
+| `dltl/config.py` | JSON configuration loader and path normalization |
+| `config.example.json` | Example data, hyperparameter and output-path configuration |
 | `DATA/` | Time-series CSV files used by the baseline experiments |
 | `TFT_DATA/` | Time-series CSV files prepared for TFT experiments |
 
@@ -48,36 +54,29 @@ PyTorch automatically uses `cuda:0` when CUDA is available and otherwise falls b
 
 ## Running an experiment
 
-The files are research scripts rather than a packaged command-line application. Before running one of them:
+The TFT files use a JSON configuration so paths and experiment parameters do not need to be edited inside the Python source.
 
-1. Set the CSV path in `river_data_info`.
-2. Fill the hyperparameter lists such as `Dropout_list`, `lr_list` and `Hidden_Layer_Size_list`.
-3. Replace the `/PATH/TO/YOUR/...` output directories with writable local paths.
+1. Copy `config.example.json` to `config.json`.
+2. Set the data locations and output directories in `config.json`.
+3. Fill the hyperparameter arrays under `training.hyperparameters`.
 4. Confirm that the expected columns exist in the selected CSV file.
 
 For example, after configuring the paths and hyperparameters:
 
 ```bash
-python PRETRAIN_TFT.py
-python FINE_TUNE_S1TO4.py
+python PRETRAIN_TFT.py --config config.json
+python FINE_TUNE_S1TO4.py --config config.json
 ```
 
-The included CSV files use a `Date` index and may require CP949 decoding, as shown in the scripts.
+Relative paths in the config file are resolved from the config file's directory. The included CSV files use a `Date` index and may require CP949 decoding; both the index column and encoding are configurable.
 
 ## Reproducibility notes
 
 - Random seeds are set in the experiment scripts.
 - Model checkpoints and generated artifacts (`*.pt`, `*.pth`, `*.pkl`) are intentionally excluded from Git.
 - The original environment versions were not recorded, so `requirements.txt` lists compatible minimum versions rather than an exact lock file.
-- Hyperparameter arrays are empty in the public snapshot. Add the values used for a specific experiment before running it.
+- Hyperparameter arrays are empty in `config.example.json`. Add the values used for a specific experiment before running it.
 
 ## Data and license
 
 Before reusing or redistributing the included data, verify its original source, license and any attribution requirements. A software license has not yet been selected for this repository; reuse of the code requires permission from the repository owner until a license is added.
-
-## Future cleanup
-
-- Move repeated preprocessing and training utilities into reusable modules.
-- Replace hard-coded paths with a YAML/TOML configuration or command-line arguments.
-- Record exact experiment parameters and results.
-- Add automated tests for sequence creation, interpolation and model tensor shapes.

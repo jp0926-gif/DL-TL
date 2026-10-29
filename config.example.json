@@ -1,0 +1,54 @@
+{
+  "data": {
+    "encoding": "cp949",
+    "index_column": "Date",
+    "input_variables": [
+      "Cyanocell",
+      "WT",
+      "Chla",
+      "TN",
+      "TP",
+      "WL",
+      "Discharge",
+      "Temp",
+      "Prec",
+      "Forecast"
+    ],
+    "locations": {
+      "NAK": {
+        "SITE": "TFT_DATA/NAK/SJB_nak_total.csv"
+      }
+    }
+  },
+  "training": {
+    "quantiles": [0.2, 0.5, 0.8],
+    "batch_size": 32,
+    "input_sequence": 2,
+    "output_sequence": 1,
+    "pretrain_epochs": 200,
+    "fine_tune_epochs": 50,
+    "hyperparameters": {
+      "dropout": [],
+      "learning_rate": [],
+      "num_lstm_layers": [],
+      "hidden_layer_size": [],
+      "embedding_dim": [],
+      "num_attention_heads": []
+    }
+  },
+  "paths": {
+    "pretrained_models": "outputs/pretrained",
+    "fine_tune_models": {
+      "scheme_a": "outputs/fine_tune/models/scheme_a",
+      "scheme_b": "outputs/fine_tune/models/scheme_b",
+      "scheme_c": "outputs/fine_tune/models/scheme_c",
+      "scheme_d": "outputs/fine_tune/models/scheme_d"
+    },
+    "fine_tune_weights": {
+      "scheme_a": "outputs/fine_tune/weights/scheme_a",
+      "scheme_b": "outputs/fine_tune/weights/scheme_b",
+      "scheme_c": "outputs/fine_tune/weights/scheme_c",
+      "scheme_d": "outputs/fine_tune/weights/scheme_d"
+    }
+  }
+}

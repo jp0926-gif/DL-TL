@@ -19,6 +19,14 @@ from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder
 from datetime import timedelta
 
+from dltl.common import (
+    TimeSeriesDataset,
+    create_sequences_with_flags,
+    kalman_filter_interpolation,
+    log10_1p,
+)
+from dltl.recurrent import LSTMModel
+
 # Set the font properties
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
@@ -35,78 +43,7 @@ print(torch.cuda.is_available)
 print(torch.version.cuda)
 print(device)
     
-class LSTMModel(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout=0.0):
-        super(LSTMModel, self).__init__()
-        self.hidden_dim = hidden_dim
-        self.num_layers = num_layers
-        self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True, dropout=dropout)
-        self.fc = nn.Linear(hidden_dim, output_dim)
-        self.dropout = nn.Dropout(dropout)
-    
-    def forward(self, x):
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim).to(x.device)
-        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim).to(x.device)
-        out, _ = self.lstm(x, (h0, c0))
-        out = self.dropout(out[:, -1, :])  # Apply dropout to the last time step's output
-        out = self.fc(out)
-        return out
-    
-def log10_1p(x):
-    return np.log10(1 + x) 
-
-class TimeSeriesDataset(Dataset):
-    def __init__(self, x, y, flags, device):
-        self.x = torch.tensor(x, dtype=torch.float32).to(device)
-        self.y = torch.tensor(y, dtype=torch.float32).to(device)
-        self.flags = torch.tensor(flags, dtype=torch.float32).to(device)  # Add flags
-    
-    def __len__(self):
-        return len(self.x)
-    
-    def __getitem__(self, index):
-        return self.x[index], self.y[index], self.flags[index]  # Return flags as well
-
-def create_sequences_with_flags(data, flags, seq_len, fct_h, target_idx):
-    xs, ys, fs = [], [], []
-    for i in range(len(data) - seq_len - fct_h + 1):
-        x = data[i:(i + seq_len), :]
-        y = data[i + seq_len + fct_h - 1, target_idx]  # Use the specified target column
-        f = flags[i + seq_len + fct_h - 1, target_idx]  # Use flag for the corresponding target column
-        xs.append(x)
-        ys.append(y)
-        fs.append(f)
-    return np.array(xs), np.array(ys).reshape(-1, 1), np.array(fs).reshape(-1, 1)
-
-from pykalman import KalmanFilter
-
-def kalman_filter_interpolation(df):
-
-    df_copy = df.copy()
-    interpolation_flags = pd.DataFrame(0, index=df_copy.index, columns=df_copy.columns)
-
-    for column in df_copy.columns:
-        values = df_copy[column].values
-        if np.isnan(values).any():
-            masked_values = np.ma.masked_invalid(values)
-            kf = KalmanFilter(
-                initial_state_mean=np.nanmean(values),
-                n_dim_obs=1,
-                transition_matrices=[1],
-                observation_matrices=[1],
-                transition_covariance=np.eye(1),
-                observation_covariance=np.eye(1)
-            )
-            kf = kf.em(masked_values, n_iter=10)
-            filled_values, _ = kf.smooth(masked_values)
-            df_copy[column] = np.where(np.isnan(values), filled_values.flatten(), values)
-            
-            # Mark interpolated values
-            interpolation_flags[column] = np.where(np.isnan(values), 1, 0)
-            # print(f"Interpolated rows for column '{column}': {np.where(np.isnan(values))[0]}")
-            # print(f"Flags for column '{column}': {interpolation_flags[column].values}")
-
-    return df_copy, interpolation_flags
+# Shared preprocessing utilities are imported from dltl.common.
 
 def train_model_with_flag_masking(model, train_dataloader, valid_dataloader, criterion, optimizer, scheduler, EPOCHS, random_seed=42, patience=50):
     # Set random seeds for reproducibility
