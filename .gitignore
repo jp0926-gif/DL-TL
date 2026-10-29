@@ -12,6 +12,10 @@ venv/
 env/
 config.json
 
+# Local datasets (keep only the documentation)
+data/*
+!data/README.md
+
 # Model checkpoints and generated artifacts
 *.pt
 *.pth
