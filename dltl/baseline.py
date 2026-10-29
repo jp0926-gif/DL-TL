@@ -32,6 +32,8 @@ def train_model_with_flag_masking(
         for train_inputs, train_targets, train_flags in train_dataloader:
             optimizer.zero_grad()
             train_outputs = model(train_inputs)
+            if isinstance(train_outputs, tuple):
+                train_outputs = train_outputs[0]
             mask = train_flags == 0
             train_outputs_masked = torch.where(
                 mask, train_outputs, torch.tensor(0.0, device=train_outputs.device)
@@ -59,6 +61,8 @@ def train_model_with_flag_masking(
         with torch.no_grad():
             for valid_inputs, valid_targets, valid_flags in valid_dataloader:
                 valid_outputs = model(valid_inputs)
+                if isinstance(valid_outputs, tuple):
+                    valid_outputs = valid_outputs[0]
                 mask = valid_flags == 0
                 valid_outputs_masked = torch.where(
                     mask, valid_outputs, torch.tensor(0.0, device=valid_outputs.device)

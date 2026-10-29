@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 SCHEMES = ("scheme_a", "scheme_b", "scheme_c", "scheme_d")
+DEFAULT_CONFIG = Path(__file__).resolve().parents[1] / "configs" / "config.example.json"
 
 
 def _resolve_path(base_dir, value):
@@ -63,7 +64,7 @@ def load_experiment_config_from_cli():
     parser = argparse.ArgumentParser(description="Run a DL-TL TFT experiment")
     parser.add_argument(
         "--config",
-        default="config.example.json",
+        default=str(DEFAULT_CONFIG),
         help="Path to a JSON experiment configuration file",
     )
     args = parser.parse_args()

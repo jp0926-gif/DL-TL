@@ -38,7 +38,7 @@ from dltl.common import (
     train_model_with_flag_masking,
 )
 from dltl.config import load_experiment_config_from_cli
-from dltl.tft import (
+from dltl.models.tft import (
     GLU,
     GatedResidualNetwork,
     InterpretableMultiHeadAttention,

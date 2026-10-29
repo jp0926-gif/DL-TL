@@ -16,7 +16,7 @@
     ],
     "locations": {
       "NAK": {
-        "SITE": "TFT_DATA/NAK/SJB_nak_total.csv"
+        "SITE": "../data/SJB_nak_total.csv"
       }
     }
   },
@@ -37,18 +37,18 @@
     }
   },
   "paths": {
-    "pretrained_models": "outputs/pretrained",
+    "pretrained_models": "../outputs/pretrained",
     "fine_tune_models": {
-      "scheme_a": "outputs/fine_tune/models/scheme_a",
-      "scheme_b": "outputs/fine_tune/models/scheme_b",
-      "scheme_c": "outputs/fine_tune/models/scheme_c",
-      "scheme_d": "outputs/fine_tune/models/scheme_d"
+      "scheme_a": "../outputs/fine_tune/models/scheme_a",
+      "scheme_b": "../outputs/fine_tune/models/scheme_b",
+      "scheme_c": "../outputs/fine_tune/models/scheme_c",
+      "scheme_d": "../outputs/fine_tune/models/scheme_d"
     },
     "fine_tune_weights": {
-      "scheme_a": "outputs/fine_tune/weights/scheme_a",
-      "scheme_b": "outputs/fine_tune/weights/scheme_b",
-      "scheme_c": "outputs/fine_tune/weights/scheme_c",
-      "scheme_d": "outputs/fine_tune/weights/scheme_d"
+      "scheme_a": "../outputs/fine_tune/weights/scheme_a",
+      "scheme_b": "../outputs/fine_tune/weights/scheme_b",
+      "scheme_c": "../outputs/fine_tune/weights/scheme_c",
+      "scheme_d": "../outputs/fine_tune/weights/scheme_d"
     }
   }
 }
